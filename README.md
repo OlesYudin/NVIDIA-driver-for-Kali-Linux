@@ -4,7 +4,7 @@
 
 Проверить какая видеокарта используется
 
-```
+```bash
 lspci | grep -E "VGA|3D"
 ```
 
@@ -12,7 +12,7 @@ lspci | grep -E "VGA|3D"
 
 Что бы отключить **NOEVEAU**, нужно отключить его, обновить конфиг и перезагрузить машину
 
-```
+```bash
 sudo echo -e "blacklist nouveau\noptions nouveau modeset=0\nalias nouveau off" > /etc/modprobe.d/blacklist-nouveau.conf
 sudo update-initramfs -u
 sudo reboot
@@ -22,7 +22,7 @@ sudo reboot
 
 После перезагрузки нужно узнать, работает ли драйвер **NOEVEAU**
 
-```
+```bash
 lsmod | grep -i nouveau
 ```
 
@@ -31,7 +31,7 @@ lsmod | grep -i nouveau
 После отключения **NOEVEAU**, можно установить драйвера **NVIDIA**
 Скорее всего драйвера будут установленны не самые свежие, но за то стабильные
 
-```
+```bash
 sudo apt-get install nvidia-driver nvidia-xconfig nvidia-prime
 ```
 
@@ -39,7 +39,7 @@ sudo apt-get install nvidia-driver nvidia-xconfig nvidia-prime
 
 Нужно проверить на какой шине находится дискретная видеокарта, для того что бы записать эти значения в конфиг (следующий шаг)
 
-```
+```bash
 nvidia-xconfig --query-gpu-info | grep 'BusID'
 ```
 
@@ -52,7 +52,7 @@ nvidia-xconfig --query-gpu-info | grep 'BusID'
 - Конфиг должен хранится по следующему пути: `/etc/X11/xorg.conf `
 - Значение `PCI:x:x:x` нужно поменять на свое, взятое из предыдущего шага.
 
-```
+```bash
 Section "ServerLayout"
     Identifier "layout"
     Screen 0 "nvidia"
@@ -90,13 +90,13 @@ EndSection
 
 Проверить какой у Вас DisplayManager
 
-```
+```bash
 cat /etc/X11/default-display-manager
 ```
 
 ### 8. Скрипт для LightDM
 
-```
+```bash
 sudo nano /etc/lightdm/display_setup.sh
 
 # Script:
@@ -106,7 +106,7 @@ xrandr --auto
 
 ### 9. Скрипт для SDDM (Default for KDE)
 
-```
+```bash
 sudo nano /usr/share/sddm/scripts/Xsetup
 
 # Script:
@@ -116,7 +116,7 @@ xrandr --auto
 
 ### 10. Скрипт для GDM
 
-```
+```bash
 sudo nano /usr/share/gdm/greeter/autostart/optimus.desktop
 sudo nano /etc/xdg/autostart/optimus.desktop
 
@@ -133,7 +133,7 @@ X-GNOME-Autostart-Phase=DisplayServer
 
 После создания скриптов и конфигов, нужно перезагрузить систему
 
-```
+```bash
 sudo reboot
 ```
 
@@ -141,7 +141,7 @@ sudo reboot
 
 Если ваша система использует драйвера **NVIDIA**, вывод следующей команды будет таким `direct rendering: Yes`
 
-```
+```bash
 glxinfo | grep -i "direct rendering"
 ```
 
@@ -149,7 +149,7 @@ glxinfo | grep -i "direct rendering"
 
 Теперь можно установить **CUDA**
 
-```
+```bash
 sudo apt-get install ocl-icd-libopencl1 nvidia-cuda-toolkit
 ```
 
@@ -161,8 +161,8 @@ sudo apt-get install ocl-icd-libopencl1 nvidia-cuda-toolkit
 
 Все значения должны быть "1" (Пример: `PRIME Synchronization: 1`)
 
-```
-xrandr --verbose|grep PRIME
+```bash
+xrandr --verbose | grep PRIME
 ```
 
 ### 15. Обновление GRUB
@@ -171,7 +171,7 @@ xrandr --verbose|grep PRIME
 
 Нужно изменить следующей поле на код ниже:
 
-```
+```bash
 ....
 GRUB_CMDLINE_LINUX_DEFAULT="quiet nvidia-drm.modeset=1"
 ...
@@ -179,20 +179,20 @@ GRUB_CMDLINE_LINUX_DEFAULT="quiet nvidia-drm.modeset=1"
 
 После сохранения, нужно обновить **GRUB**
 
-```
+```bash
 sudo update-grub
 sudo reboot
 ```
 
 После перезагрузки, проверьте используется ли **PRIME NVIDIA**
 
-```
+```bash
 xrandr --verbose|grep PRIME
 ```
 
 Вывод должен быть следующим:
 
-```
+```bash
 PRIME Synchronization: 1
 PRIME Synchronization: 1
 ```
@@ -206,7 +206,7 @@ PRIME Synchronization: 1
 1. Перейти в терминал с псевдографикой (ALT+CTRL+F2 или ALT+CTRL+F3 и так далее)
 2. Удалить созданные ранее конфиги, скорее всего они были созданы не правильно и ииз-за них не работает дисплей
 
-```
+```bash
 sudo apt-get remove --purge nvidia*
 sudo rm -rf /etc/X11/xorg.conf
 
@@ -223,23 +223,27 @@ sudo rm -rf /etc/xdg/autostart/optimus.desktop
 
 3. Перезагрузить систему
 
+```bash
+sudo reboot
+```
+
 ## 2. Не устанавливается драйвер NVIDIA
 
 1. Проверьте, действительно не используетеся **NOUVEAU**
 
-```
+```bash
 lsmod | grep -i nouveau
 ```
 
 2. Если используется, отключите его перейдя к [шагу 2]("шагу 2")
 
-```
+```bash
 sudo echo -e "blacklist nouveau\noptions nouveau modeset=0\nalias nouveau off" > /etc/modprobe.d/blacklist-nouveau.conf
 sudo update-initramfs -u
 ```
 
 3. Перезагрузите систему
 
-```
+```bash
 sudo reboot
 ```
