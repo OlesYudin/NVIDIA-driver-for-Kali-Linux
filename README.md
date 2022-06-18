@@ -13,7 +13,7 @@ lspci | grep -E "VGA|3D"
 Что бы отключить **NOEVEAU**, нужно отключить его, обновить конфиг и перезагрузить машину
 
 ```bash
-sudo echo -e "blacklist nouveau\noptions nouveau modeset=0\nalias nouveau off" > /etc/modprobe.d/blacklist-nouveau.conf
+sudo echo -e "blacklist nouveau\noptions nouveau modeset=0\nalias nouveau off" | sudo tee --append /etc/modprobe.d/blacklist-nouveau.conf
 sudo update-initramfs -u
 sudo reboot
 ```
