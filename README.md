@@ -235,7 +235,7 @@ sudo reboot
 lsmod | grep -i nouveau
 ```
 
-2. Если используется, отключите его перейдя к [шагу 2]("шагу 2")
+2. Если используется, отключите его перейдя к [шагу 2](#2-Отключить-проприетарный-драйвер-NOUVEAU "шагу 2")
 
 ```bash
 sudo echo -e "blacklist nouveau\noptions nouveau modeset=0\nalias nouveau off" > /etc/modprobe.d/blacklist-nouveau.conf
