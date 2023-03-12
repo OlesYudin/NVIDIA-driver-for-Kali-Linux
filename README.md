@@ -84,6 +84,12 @@ EndSection
 
 Если Вас не устраивает данный конфиг, его можно переделать под себя по следующей [инструкции](http://us.download.nvidia.com/XFree86/Linux-x86/375.39/README/randr14.html "инструкции")
 
+Так же, можно попробовать с помощью команды `nvidia-xconfig` сгенерировать правильный `/etc/X11/xorg.conf`.
+```bash
+nvidia-xconfig --enable-all-gpus
+nvidia-xconfig --cool-bits=4
+```
+
 ## 7. Создания скрипта для DisplayManager
 
 Скрипт должен подходить под ваше рабочее окружение. Все скрипты для рабочих окружений можно найти [тут](https://wiki.archlinux.org/title/NVIDIA_Optimus#Display_Managers "тут").
