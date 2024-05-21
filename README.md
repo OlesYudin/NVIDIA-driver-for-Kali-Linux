@@ -1,16 +1,16 @@
-# Установка драйверов NVIDIA на Kali Linux 2022
+# Installing NVIDIA Drivers on Kali Linux 2022
 
-## 1. Проверка видеокарты
+## 1. Checking the Graphics Card
 
-Проверить какая видеокарта используется
+Check which graphics card is being used
 
 ```bash
 lspci | grep -E "VGA|3D"
 ```
 
-## 2. Отключить проприетарный драйвер NOUVEAU
+## 2. Disable the NOEVEAU Proprietary Driver
 
-Что бы отключить **NOEVEAU**, нужно отключить его, обновить конфиг и перезагрузить машину
+To disable **NOEVEAU**, it needs to be blacklisted, update the configuration, and reboot the machine
 
 ```bash
 sudo echo -e "blacklist nouveau\noptions nouveau modeset=0\nalias nouveau off" | sudo tee --append /etc/modprobe.d/blacklist-nouveau.conf
@@ -18,39 +18,39 @@ sudo update-initramfs -u
 sudo reboot
 ```
 
-## 3. Проверка драйвера NOUVEAU
+## 3. Checking the NOEVEAU Driver
 
-После перезагрузки нужно узнать, работает ли драйвер **NOEVEAU**
+After rebooting, check if the **NOEVEAU** driver is working
 
 ```bash
 lsmod | grep -i nouveau
 ```
 
-## 4. Установка драйверов NVIDIA
+## 4. Installing NVIDIA Drivers
 
-После отключения **NOEVEAU**, можно установить драйвера **NVIDIA**
-Скорее всего драйвера будут установленны не самые свежие, но за то стабильные
+After disabling **NOEVEAU**, you can install the **NVIDIA** drivers
+Most likely, the drivers installed will not be the latest, but they will be stable
 
 ```bash
 sudo apt-get install nvidia-driver nvidia-xconfig nvidia-prime
 ```
 
-## 5. Проверка шины видеокарты
+## 5. Checking the Graphics Card Bus
 
-Нужно проверить на какой шине находится дискретная видеокарта, для того что бы записать эти значения в конфиг (следующий шаг)
+Check which bus the discrete graphics card is on, in order to record these values in the configuration (next step)
 
 ```bash
 nvidia-xconfig --query-gpu-info | grep 'BusID'
 ```
 
-Нужно запомнить значения BusID к примеру `PCI:3:0:0`
+Remember the BusID values, for example `PCI:3:0:0`
 
-## 6. Создание 'Xconfig'
+## 6. Creating 'Xconfig'
 
-**Xconfig** нужен для того, что бы система понимала как работать с видеокартой, следующий пример заставляет систему работать с дискретной видеокартой.
+**Xconfig** is needed for the system to understand how to work with the graphics card; the following example makes the system work with the discrete graphics card.
 
-- Конфиг должен хранится по следующему пути: `/etc/X11/xorg.conf `
-- Значение `PCI:x:x:x` нужно поменять на свое, взятое из предыдущего шага.
+- The configuration should be stored at the following path: `/etc/X11/xorg.conf `
+- Replace `PCI:x:x:x` with your own value taken from the previous step.
 
 ```bash
 Section "ServerLayout"
@@ -82,25 +82,26 @@ Section "Screen"
 EndSection
 ```
 
-Если Вас не устраивает данный конфиг, его можно переделать под себя по следующей [инструкции](http://us.download.nvidia.com/XFree86/Linux-x86/375.39/README/randr14.html "инструкции")
+If you are not satisfied with this configuration, you can customize it following this [instruction](http://us.download.nvidia.com/XFree86/Linux-x86/375.39/README/randr14.html "instruction").
 
-Так же, можно попробовать с помощью команды `nvidia-xconfig` сгенерировать правильный `/etc/X11/xorg.conf`.
+Alternatively, you can try generating the correct `/etc/X11/xorg.conf` using the `nvidia-xconfig` command.
+
 ```bash
 nvidia-xconfig --enable-all-gpus
 nvidia-xconfig --cool-bits=4
 ```
 
-## 7. Создания скрипта для DisplayManager
+## 7. Creating DisplayManager Script
 
-Скрипт должен подходить под ваше рабочее окружение. Все скрипты для рабочих окружений можно найти [тут](https://wiki.archlinux.org/title/NVIDIA_Optimus#Display_Managers "тут").
+The script should fit your desktop environment. All scripts for desktop environments can be found [here](https://wiki.archlinux.org/title/NVIDIA_Optimus#Display_Managers "here").
 
-Проверить какой у Вас DisplayManager
+Check which DisplayManager you have
 
 ```bash
 cat /etc/X11/default-display-manager
 ```
 
-### 8. Скрипт для LightDM
+### 7.1 Script for LightDM
 
 ```bash
 sudo nano /etc/lightdm/display_setup.sh
@@ -110,7 +111,7 @@ xrandr --setprovideroutputsource modesetting NVIDIA-0
 xrandr --auto
 ```
 
-### 9. Скрипт для SDDM (Default for KDE)
+### 7.2 Script for SDDM (Default for KDE)
 
 ```bash
 sudo nano /usr/share/sddm/scripts/Xsetup
@@ -120,7 +121,7 @@ xrandr --setprovideroutputsource modesetting NVIDIA-0
 xrandr --auto
 ```
 
-### 10. Скрипт для GDM
+### 7.3 Script for GDM
 
 ```bash
 sudo nano /usr/share/gdm/greeter/autostart/optimus.desktop
@@ -135,47 +136,47 @@ NoDisplay=true
 X-GNOME-Autostart-Phase=DisplayServer
 ```
 
-## 11. Перезагрузка системы
+## 8. Reboot the System
 
-После создания скриптов и конфигов, нужно перезагрузить систему
+After creating the scripts and configurations, reboot the system
 
 ```bash
-sudo reboot
+sudo reboot -h now
 ```
 
-## 12. Проверка использования драйверов NVIDIA
+## 9. Checking NVIDIA Driver Usage
 
-Если ваша система использует драйвера **NVIDIA**, вывод следующей команды будет таким `direct rendering: Yes`
+If your system is using **NVIDIA** drivers, the output of the following command will be `direct rendering: Yes`.
 
 ```bash
 glxinfo | grep -i "direct rendering"
 ```
 
-## 13. Устанвка CUDA toolkit
+## 10. Installing CUDA Toolkit
 
-Теперь можно установить **CUDA**
+Now you can install **CUDA**
 
 ```bash
 sudo apt-get install ocl-icd-libopencl1 nvidia-cuda-toolkit
 ```
 
-## 14. Обновления GRUB
+## 11. Updating GRUB
 
-Если у вас несколько ОС на одной машине, нужно обновить GRUB.
+If you have multiple operating systems on one machine, you need to update GRUB.
 
-### Проверка использования PRIME NVIDIA
+### 11.1 Checking PRIME NVIDIA Usage
 
-Все значения должны быть "1" (Пример: `PRIME Synchronization: 1`)
+All values should be "1" (Example: `PRIME Synchronization: 1`)
 
 ```bash
 xrandr --verbose | grep PRIME
 ```
 
-### 15. Обновление GRUB
+### 11.2 Updating GRUB
 
-Конфиг для **GRUB** находится по следующему пути: `/etc/default/grub`
+The **GRUB** configuration is located at: `/etc/default/grub`
 
-Нужно изменить следующей поле на код ниже:
+You need to change the following field to the code below:
 
 ```bash
 ....
@@ -183,73 +184,74 @@ GRUB_CMDLINE_LINUX_DEFAULT="quiet nvidia-drm.modeset=1"
 ...
 ```
 
-После сохранения, нужно обновить **GRUB**
+After saving, update **GRUB**
 
 ```bash
 sudo update-grub
-sudo reboot
+sudo reboot -h now
 ```
 
-После перезагрузки, проверьте используется ли **PRIME NVIDIA**
+After rebooting, check if **PRIME NVIDIA** is being used
 
 ```bash
 xrandr --verbose|grep PRIME
 ```
 
-Вывод должен быть следующим:
+The output should be the following:
 
 ```bash
 PRIME Synchronization: 1
 PRIME Synchronization: 1
 ```
 
-# Проблемы которые могут возникнуть
+# Potential Issues
 
-## 1. Черный экран
+## 1. Black Screen
 
-Если после перезагрузки у Вас показывается черный экран, нужно:
+If you see a black screen after rebooting, you need to:
 
-1. Перейти в терминал с псевдографикой (ALT+CTRL+F2 или ALT+CTRL+F3 и так далее)
-2. Удалить созданные ранее конфиги, скорее всего они были созданы не правильно и ииз-за них не работает дисплей
+1. Switch to a pseudo-graphical terminal (ALT+CTRL+F2 or ALT+CTRL+F3 and so on).
+2. Remove the previously created configurations; they were likely created incorrectly and are causing the display not to work.
 
 ```bash
 sudo apt-get remove --purge nvidia*
 sudo rm -rf /etc/X11/xorg.conf
 
-# Для LightDM
+# For LightDM
 sudo rm -rf /etc/lightdm/lightdm.conf
 
-# ДляSDDM
+# For SDDM
 sudo rm -rf /usr/share/sddm/scripts/Xsetup
 
-# Для GDM
+# For GDM
 sudo rm -rf /usr/share/gdm/greeter/autostart/optimus.desktop
 sudo rm -rf /etc/xdg/autostart/optimus.desktop
 ```
 
-3. Перезагрузить систему
+3. Reboot the system
 
 ```bash
-sudo reboot
+sudo reboot -h now
 ```
 
-## 2. Не устанавливается драйвер NVIDIA
+## 2. NVIDIA Driver Installation Failure
 
-1. Проверьте, действительно не используетеся **NOUVEAU**
+1. Check if **NOUVEAU** is actually in use
 
 ```bash
 lsmod | grep -i nouveau
 ```
 
-2. Если используется, отключите его перейдя к [шагу 2](#2-Отключить-проприетарный-драйвер-NOUVEAU "шагу 2")
+2. If it is in use, disable it by proceeding to [step 2](#2-Disable-the-NOEVEAU-Proprietary-Driver "step 2")
+
 
 ```bash
 sudo echo -e "blacklist nouveau\noptions nouveau modeset=0\nalias nouveau off" > /etc/modprobe.d/blacklist-nouveau.conf
 sudo update-initramfs -u
 ```
 
-3. Перезагрузите систему
+3. Reboot the system
 
 ```bash
-sudo reboot
+sudo reboot -h now
 ```
